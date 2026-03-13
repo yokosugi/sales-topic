@@ -9,7 +9,7 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getDatabase, ref, runTransaction, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+  import { getDatabase, ref, onValue, set, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
   const firebaseConfig = {
     apiKey:            "AIzaSyBxpnH1EVG4NPKwF6RYEONlKLDnm-psRu8",
@@ -24,11 +24,12 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  window._firebaseReady = true;
   window._db = db;
   window._ref = ref;
-  window._runTransaction = runTransaction;
+  window._set = set;
+  window._remove = remove;
   window._onValue = onValue;
+  window._firebaseReady = true;
   if (window._onFirebaseReady) window._onFirebaseReady();
 </script>
 
@@ -45,8 +46,8 @@
   --tag-bg: #f0fdf4;
   --tag-text: #166534;
   --tag-border: #bbf7d0;
-  --like-color: #dc2626;
-  --like-bg: #fff1f2;
+  --pin-color: #d97706;
+  --pin-bg: #fffbeb;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.09);
   --r: 8px;
@@ -77,7 +78,7 @@ header { background:var(--surface); border-bottom:1px solid var(--border); heigh
 .count-badge { margin-left:auto; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:3px 10px; }
 
 #alerts-container { display:flex; flex-direction:column; gap:8px; }
-.alert-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:18px 20px; display:grid; grid-template-columns:1fr 64px; gap:16px; align-items:start; box-shadow:var(--shadow-sm); transition:border-color .15s, box-shadow .15s; opacity:0; transform:translateY(5px); animation:cardIn .22s ease forwards; }
+.alert-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:18px 20px; display:grid; grid-template-columns:1fr 56px; gap:16px; align-items:start; box-shadow:var(--shadow-sm); transition:border-color .15s, box-shadow .15s; opacity:0; transform:translateY(5px); animation:cardIn .22s ease forwards; }
 @keyframes cardIn { to{opacity:1;transform:translateY(0)} }
 .alert-card:hover { border-color:var(--border-hover); box-shadow:var(--shadow-md); }
 .card-meta { display:flex; align-items:center; gap:8px; margin-bottom:7px; flex-wrap:wrap; }
@@ -90,36 +91,35 @@ header { background:var(--surface); border-bottom:1px solid var(--border); heigh
 .card-title a:hover { color:var(--accent); text-decoration:underline; text-underline-offset:3px; }
 .card-snippet { font-size:12px; color:var(--muted); line-height:1.75; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 
-.like-wrap { display:flex; justify-content:center; padding-top:2px; }
-.like-btn { display:flex; flex-direction:column; align-items:center; gap:3px; width:56px; padding:9px 6px; border:1px solid var(--border); border-radius:var(--r); background:var(--surface); cursor:pointer; transition:all .15s; color:var(--muted); user-select:none; }
-.like-btn:hover { border-color:var(--like-color); color:var(--like-color); background:var(--like-bg); }
-.like-btn.liked { border-color:var(--like-color); background:var(--like-bg); color:var(--like-color); }
-.like-icon { font-size:18px; line-height:1; transition:transform .15s; }
-.like-btn:hover .like-icon { transform:scale(1.2); }
-.like-btn.liked .like-icon { transform:scale(1.1); }
-.like-count { font-family:'DM Mono',monospace; font-size:14px; font-weight:500; line-height:1; }
-.like-label { font-size:9px; letter-spacing:.06em; font-weight:500; opacity:.7; }
+/* Pin button */
+.pin-wrap { display:flex; justify-content:center; padding-top:2px; }
+.pin-btn { display:flex; flex-direction:column; align-items:center; gap:3px; width:48px; padding:8px 4px; border:1px solid var(--border); border-radius:var(--r); background:var(--surface); cursor:pointer; transition:all .15s; user-select:none; }
+.pin-btn:hover { border-color:var(--pin-color); background:var(--pin-bg); }
+.pin-btn.pinned { border-color:var(--pin-color); background:var(--pin-bg); }
+.pin-icon { font-size:18px; line-height:1; transition:transform .15s; }
+.pin-btn:hover .pin-icon { transform:scale(1.2); }
+.pin-btn.pinned .pin-icon { transform:scale(1.1); }
+.pin-label { font-size:9px; letter-spacing:.04em; font-weight:500; color:var(--muted); }
+.pin-btn.pinned .pin-label { color:var(--pin-color); }
 
+/* Sidebar */
 .sidebar { position:sticky; top:78px; }
-.ranking-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow-sm); overflow:hidden; }
-.ranking-header { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
-.ranking-header-title { font-size:13px; font-weight:700; letter-spacing:.02em; }
-.ranking-list { list-style:none; }
-.ranking-item { display:flex; align-items:flex-start; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border); transition:background .12s; }
-.ranking-item:last-child { border-bottom:none; }
-.ranking-item:hover { background:var(--bg); }
-.rank-num { font-family:'DM Mono',monospace; font-size:13px; font-weight:700; min-width:20px; line-height:1.4; }
-.rank-num.gold { color:#d97706; }
-.rank-num.silver { color:#6b7280; }
-.rank-num.bronze { color:#92400e; }
-.rank-body { flex:1; min-width:0; }
-.rank-title { font-size:12px; font-weight:500; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.rank-title a { color:var(--text); text-decoration:none; }
-.rank-title a:hover { color:var(--accent); }
-.rank-meta { display:flex; align-items:center; gap:6px; margin-top:4px; }
-.rank-likes { font-family:'DM Mono',monospace; font-size:11px; color:var(--like-color); font-weight:500; }
-.rank-kw { font-size:10px; color:var(--muted); }
-.ranking-empty { padding:24px 16px; text-align:center; color:var(--muted); font-size:12px; }
+.clip-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow-sm); overflow:hidden; }
+.clip-header { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+.clip-header-title { font-size:13px; font-weight:700; letter-spacing:.02em; }
+.clip-list { list-style:none; max-height:80vh; overflow-y:auto; }
+.clip-item { display:flex; align-items:flex-start; gap:8px; padding:11px 16px; border-bottom:1px solid var(--border); transition:background .12s; }
+.clip-item:last-child { border-bottom:none; }
+.clip-item:hover { background:var(--bg); }
+.clip-pin { font-size:13px; flex-shrink:0; margin-top:2px; }
+.clip-body { flex:1; min-width:0; }
+.clip-title { font-size:12px; font-weight:500; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.clip-title a { color:var(--text); text-decoration:none; }
+.clip-title a:hover { color:var(--accent); }
+.clip-meta { display:flex; align-items:center; gap:6px; margin-top:3px; }
+.clip-kw { font-size:10px; color:var(--muted); }
+.clip-date { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); }
+.clip-empty { padding:24px 16px; text-align:center; color:var(--muted); font-size:12px; }
 
 .state-msg { text-align:center; padding:72px 0; color:var(--muted); }
 .state-msg .icon { font-size:30px; margin-bottom:10px; }
@@ -129,9 +129,7 @@ header { background:var(--surface); border-bottom:1px solid var(--border); heigh
   .sidebar { position:static; }
   header { padding:0 16px; }
   .alert-card { grid-template-columns:1fr; }
-  .like-wrap { justify-content:flex-start; }
-  .like-btn { flex-direction:row; width:auto; padding:6px 12px; gap:8px; }
-  .like-label { display:none; }
+  .pin-wrap { justify-content:flex-start; }
 }
 </style>
 </head>
@@ -168,13 +166,13 @@ header { background:var(--surface); border-bottom:1px solid var(--border); heigh
   </div>
 
   <aside class="sidebar">
-    <div class="ranking-panel">
-      <div class="ranking-header">
-        <span>❤️</span>
-        <span class="ranking-header-title">注目ランキング TOP10</span>
+    <div class="clip-panel">
+      <div class="clip-header">
+        <span>📌</span>
+        <span class="clip-header-title">クリップした記事</span>
       </div>
-      <ul class="ranking-list" id="ranking-list">
-        <li class="ranking-empty">データを読み込み中...</li>
+      <ul class="clip-list" id="clip-list">
+        <li class="clip-empty">クリップされた記事はありません</li>
       </ul>
     </div>
   </aside>
@@ -183,26 +181,28 @@ header { background:var(--surface); border-bottom:1px solid var(--border); heigh
 <script>
 const DATA_URL = 'https://yokosugi.github.io/sales-topic/alerts-data.json';
 
-let allAlerts = [], likeCounts = {}, searchQuery = '', activeKeyword = 'ALL';
-let likedSet = new Set(JSON.parse(localStorage.getItem('alert_liked') || '[]'));
+let allAlerts = [], searchQuery = '', activeKeyword = 'ALL';
 let firebaseReady = false;
 
-// シンプルなハッシュ関数（衝突しにくい32bit整数→16進数文字列）
+// clips: { id: { title, url, keyword, date, clippedAt } } — Firebaseで共有
+let clips = {};
+
 function makeId(url) {
   let h = 2166136261;
   for (let i = 0; i < url.length; i++) {
     h ^= url.charCodeAt(i);
     h = (h * 16777619) >>> 0;
   }
-  return 'a' + h.toString(16).padStart(8, '0');
+  return 'c' + h.toString(16).padStart(8, '0');
 }
 
 function onFirebaseReady() {
   firebaseReady = true;
-  window._onValue(window._ref(window._db, 'likes'), snap => {
-    likeCounts = snap.val() || {};
+  // クリップ一覧をリアルタイム同期
+  window._onValue(window._ref(window._db, 'clips'), snap => {
+    clips = snap.val() || {};
     renderAlerts();
-    renderRanking();
+    renderClips();
   });
 }
 
@@ -217,7 +217,6 @@ async function loadAlerts() {
     document.getElementById('last-updated').textContent = '最終更新: ' + (data.lastUpdated || '不明');
     buildSelect();
     renderAlerts();
-    renderRanking();
   } catch(e) {
     document.getElementById('alerts-container').innerHTML =
       '<div class="state-msg"><div class="icon">⚠️</div><p>データの読み込みに失敗しました</p></div>';
@@ -245,7 +244,7 @@ function renderAlerts() {
   if (!list.length) { c.innerHTML = '<div class="state-msg"><div class="icon">📭</div><p>該当する記事がありません</p></div>'; return; }
 
   c.innerHTML = list.map((a, i) => {
-    const count = likeCounts[a.id] || 0, liked = likedSet.has(a.id);
+    const pinned = !!clips[a.id];
     return `<div class="alert-card" style="animation-delay:${Math.min(i,15)*.025}s">
       <div>
         <div class="card-meta">
@@ -256,58 +255,51 @@ function renderAlerts() {
         <div class="card-title"><a href="${a.url||'#'}" target="_blank" rel="noopener">${a.title||'（タイトルなし）'}</a></div>
         ${a.snippet ? `<div class="card-snippet">${a.snippet}</div>` : ''}
       </div>
-      <div class="like-wrap">
-        <button class="like-btn ${liked?'liked':''}" onclick="toggleLike('${a.id}',this)" title="注目する">
-          <span class="like-icon">${liked?'❤️':'🤍'}</span>
-          <span class="like-count" id="lc-${a.id}">${count}</span>
-          <span class="like-label">注目</span>
+      <div class="pin-wrap">
+        <button class="pin-btn ${pinned?'pinned':''}" onclick="togglePin('${a.id}','${encodeURIComponent(a.title||'')}','${encodeURIComponent(a.url||'')}','${encodeURIComponent(a.keyword||'')}','${a.date||''}',this)" title="クリップする">
+          <span class="pin-icon">${pinned?'📌':'📍'}</span>
+          <span class="pin-label">${pinned?'済':'クリップ'}</span>
         </button>
       </div>
     </div>`;
   }).join('');
 }
 
-function renderRanking() {
-  const ranked = allAlerts
-    .map(a => ({ ...a, likes: likeCounts[a.id] || 0 }))
-    .filter(a => a.likes > 0)
-    .sort((a, b) => b.likes - a.likes)
-    .slice(0, 10);
-
-  const ul = document.getElementById('ranking-list');
-  if (!ranked.length) {
-    ul.innerHTML = '<li class="ranking-empty">まだ注目された記事がありません</li>';
+function renderClips() {
+  const ul = document.getElementById('clip-list');
+  const sorted = Object.entries(clips).sort((a, b) => (b[1].clippedAt||0) - (a[1].clippedAt||0));
+  if (!sorted.length) {
+    ul.innerHTML = '<li class="clip-empty">クリップされた記事はありません</li>';
     return;
   }
-
-  const rankMark = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
-  const rankClass = i => i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-
-  ul.innerHTML = ranked.map((a, i) => `
-    <li class="ranking-item">
-      <span class="rank-num ${rankClass(i)}">${rankMark(i)}</span>
-      <div class="rank-body">
-        <div class="rank-title"><a href="${a.url||'#'}" target="_blank" rel="noopener">${a.title||'（タイトルなし）'}</a></div>
-        <div class="rank-meta">
-          <span class="rank-likes">❤️ ${a.likes}</span>
-          <span class="rank-kw">${a.keyword||''}</span>
+  ul.innerHTML = sorted.map(([id, c]) => `
+    <li class="clip-item">
+      <span class="clip-pin">📌</span>
+      <div class="clip-body">
+        <div class="clip-title"><a href="${decodeURIComponent(c.url||'')}" target="_blank" rel="noopener">${decodeURIComponent(c.title||'')}</a></div>
+        <div class="clip-meta">
+          <span class="clip-kw">${decodeURIComponent(c.keyword||'')}</span>
+          <span class="clip-date">${c.date||''}</span>
         </div>
       </div>
     </li>`).join('');
 }
 
-function toggleLike(id, btn) {
-  if (!firebaseReady) { alert('Firebaseが未設定です。'); return; }
-  const already = likedSet.has(id);
-  likeCounts[id] = Math.max(0, (likeCounts[id]||0) + (already ? -1 : 1));
-  window._runTransaction(window._ref(window._db, 'likes/'+id), cur => Math.max(0,(cur||0)+(already?-1:1)));
-  already ? likedSet.delete(id) : likedSet.add(id);
-  localStorage.setItem('alert_liked', JSON.stringify([...likedSet]));
-  btn.classList.toggle('liked', !already);
-  btn.querySelector('.like-icon').textContent = already ? '🤍' : '❤️';
-  const countEl = document.getElementById('lc-' + id);
-  if (countEl) countEl.textContent = likeCounts[id];
-  renderRanking();
+function togglePin(id, title, url, keyword, date, btn) {
+  if (!firebaseReady) { alert('Firebase未接続です'); return; }
+  const pinned = !!clips[id];
+  if (pinned) {
+    window._remove(window._ref(window._db, 'clips/' + id));
+  } else {
+    window._set(window._ref(window._db, 'clips/' + id), {
+      title, url, keyword, date,
+      clippedAt: Date.now(),
+    });
+  }
+  // 楽観的UI更新
+  btn.classList.toggle('pinned', !pinned);
+  btn.querySelector('.pin-icon').textContent = pinned ? '📍' : '📌';
+  btn.querySelector('.pin-label').textContent = pinned ? 'クリップ' : '済';
 }
 
 document.getElementById('search-input').addEventListener('input', e => { searchQuery = e.target.value; renderAlerts(); });
