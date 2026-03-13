@@ -1,0 +1,21 @@
+{
+  "lastUpdated": "2026-03-13 10:00",
+  "alerts": [
+    {
+      "keyword": "営業力強化",
+      "date": "2026-03-13",
+      "title": "【サンプル】営業力強化のための最新トレンドとは",
+      "url": "https://example.com/article1",
+      "snippet": "これはサンプルデータです。GASスクリプトが動き始めると、本物の記事に置き換わります。",
+      "source": "example.com"
+    },
+    {
+      "keyword": "セールスイネーブルメント",
+      "date": "2026-03-12",
+      "title": "【サンプル】セールスイネーブルメントで変わる営業組織",
+      "url": "https://example.com/article2",
+      "snippet": "GASスクリプトを設定してトリガーを実行すると、Gmailから本物のアラートが取得されます。",
+      "source": "example.com"
+    }
+  ]
+}
