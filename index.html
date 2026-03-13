@@ -54,6 +54,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Noto Sans JP',sans-serif; font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased; }
 
+/* Header */
 header { background:var(--surface); border-bottom:1px solid var(--border); height:54px; padding:0 32px; display:flex; align-items:center; gap:18px; position:sticky; top:0; z-index:100; }
 .brand { display:flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:12px; font-weight:500; letter-spacing:.06em; white-space:nowrap; }
 .live-dot { width:7px; height:7px; border-radius:50%; background:#22c55e; animation:blink 2.4s ease-in-out infinite; flex-shrink:0; }
@@ -66,20 +67,19 @@ header { background:var(--surface); border-bottom:1px solid var(--border); heigh
 .search-input::placeholder { color:#bbb; }
 .search-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(26,86,219,.1); }
 
-.main { max-width:920px; margin:0 auto; padding:28px 32px 60px; }
+/* Layout */
+.layout { max-width:1200px; margin:0 auto; padding:28px 32px 60px; display:grid; grid-template-columns:1fr 280px; gap:24px; align-items:start; }
 
+/* Controls */
 .controls { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
 .ctrl-label { font-size:12px; color:var(--muted); font-weight:500; white-space:nowrap; }
 .sel-wrap { position:relative; display:inline-flex; align-items:center; }
-.kw-select { appearance:none; padding:6px 28px 6px 12px; border:1px solid var(--border); border-radius:var(--r); background:var(--surface); font-size:13px; font-family:'Noto Sans JP',sans-serif; color:var(--text); cursor:pointer; outline:none; transition:border-color .15s; min-width:200px; }
+.kw-select { appearance:none; padding:6px 28px 6px 12px; border:1px solid var(--border); border-radius:var(--r); background:var(--surface); font-size:13px; font-family:'Noto Sans JP',sans-serif; color:var(--text); cursor:pointer; outline:none; transition:border-color .15s; min-width:180px; }
 .kw-select:hover,.kw-select:focus { border-color:var(--accent); }
 .chevron { position:absolute; right:8px; pointer-events:none; color:var(--muted); }
-.sort-group { display:flex; border:1px solid var(--border); border-radius:var(--r); overflow:hidden; background:var(--surface); }
-.sort-btn { padding:6px 14px; font-size:12px; font-family:'Noto Sans JP',sans-serif; border:none; background:none; color:var(--muted); cursor:pointer; border-right:1px solid var(--border); transition:background .12s, color .12s; white-space:nowrap; }
-.sort-btn:last-child { border-right:none; }
-.sort-btn.active { background:var(--accent-light); color:var(--accent); font-weight:500; }
 .count-badge { margin-left:auto; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:3px 10px; }
 
+/* Cards */
 #alerts-container { display:flex; flex-direction:column; gap:8px; }
 .alert-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:18px 20px; display:grid; grid-template-columns:1fr 64px; gap:16px; align-items:start; box-shadow:var(--shadow-sm); transition:border-color .15s, box-shadow .15s; opacity:0; transform:translateY(5px); animation:cardIn .22s ease forwards; }
 @keyframes cardIn { to{opacity:1;transform:translateY(0)} }
@@ -94,6 +94,7 @@ header { background:var(--surface); border-bottom:1px solid var(--border); heigh
 .card-title a:hover { color:var(--accent); text-decoration:underline; text-underline-offset:3px; }
 .card-snippet { font-size:12px; color:var(--muted); line-height:1.75; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 
+/* Like */
 .like-wrap { display:flex; justify-content:center; padding-top:2px; }
 .like-btn { display:flex; flex-direction:column; align-items:center; gap:3px; width:56px; padding:9px 6px; border:1px solid var(--border); border-radius:var(--r); background:var(--surface); cursor:pointer; transition:all .15s; color:var(--muted); user-select:none; }
 .like-btn:hover { border-color:var(--like-color); color:var(--like-color); background:var(--like-bg); }
@@ -104,12 +105,36 @@ header { background:var(--surface); border-bottom:1px solid var(--border); heigh
 .like-count { font-family:'DM Mono',monospace; font-size:14px; font-weight:500; line-height:1; }
 .like-label { font-size:9px; letter-spacing:.06em; font-weight:500; opacity:.7; }
 
+/* Ranking sidebar */
+.sidebar { position:sticky; top:78px; }
+.ranking-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow-sm); overflow:hidden; }
+.ranking-header { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+.ranking-header-title { font-size:13px; font-weight:700; letter-spacing:.02em; }
+.ranking-list { list-style:none; }
+.ranking-item { display:flex; align-items:flex-start; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border); transition:background .12s; }
+.ranking-item:last-child { border-bottom:none; }
+.ranking-item:hover { background:var(--bg); }
+.rank-num { font-family:'DM Mono',monospace; font-size:13px; font-weight:700; min-width:20px; line-height:1.4; }
+.rank-num.gold { color:#d97706; }
+.rank-num.silver { color:#6b7280; }
+.rank-num.bronze { color:#92400e; }
+.rank-body { flex:1; min-width:0; }
+.rank-title { font-size:12px; font-weight:500; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.rank-title a { color:var(--text); text-decoration:none; }
+.rank-title a:hover { color:var(--accent); }
+.rank-meta { display:flex; align-items:center; gap:6px; margin-top:4px; }
+.rank-likes { font-family:'DM Mono',monospace; font-size:11px; color:var(--like-color); font-weight:500; }
+.rank-kw { font-size:10px; color:var(--muted); }
+.ranking-empty { padding:24px 16px; text-align:center; color:var(--muted); font-size:12px; }
+
+/* State */
 .state-msg { text-align:center; padding:72px 0; color:var(--muted); }
 .state-msg .icon { font-size:30px; margin-bottom:10px; }
 
-@media(max-width:600px) {
+@media(max-width:800px) {
+  .layout { grid-template-columns:1fr; padding:16px; }
+  .sidebar { position:static; }
   header { padding:0 16px; }
-  .main { padding:20px 16px 40px; }
   .alert-card { grid-template-columns:1fr; }
   .like-wrap { justify-content:flex-start; }
   .like-btn { flex-direction:row; width:auto; padding:6px 12px; gap:8px; }
@@ -132,30 +157,42 @@ header { background:var(--surface); border-bottom:1px solid var(--border); heigh
   </div>
 </header>
 
-<main class="main">
-  <div class="controls">
-    <span class="ctrl-label">キーワード</span>
-    <div class="sel-wrap">
-      <select class="kw-select" id="kw-select">
-        <option value="ALL">すべてのキーワード</option>
-      </select>
-      <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+<div class="layout">
+  <!-- 左：記事一覧 -->
+  <div class="main-col">
+    <div class="controls">
+      <span class="ctrl-label">キーワード</span>
+      <div class="sel-wrap">
+        <select class="kw-select" id="kw-select">
+          <option value="ALL">すべてのキーワード</option>
+        </select>
+        <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <span class="count-badge" id="count-badge">— 件</span>
     </div>
-    <div class="sort-group">
-      <button class="sort-btn active" data-sort="date" onclick="setSort(this)">新着順</button>
-      <button class="sort-btn" data-sort="likes" onclick="setSort(this)">❤️ 注目順</button>
+    <div id="alerts-container">
+      <div class="state-msg"><div class="icon">⏳</div><p>データを読み込み中...</p></div>
     </div>
-    <span class="count-badge" id="count-badge">— 件</span>
   </div>
-  <div id="alerts-container">
-    <div class="state-msg"><div class="icon">⏳</div><p>データを読み込み中...</p></div>
-  </div>
-</main>
+
+  <!-- 右：ランキング -->
+  <aside class="sidebar">
+    <div class="ranking-panel">
+      <div class="ranking-header">
+        <span>❤️</span>
+        <span class="ranking-header-title">注目ランキング TOP10</span>
+      </div>
+      <ul class="ranking-list" id="ranking-list">
+        <li class="ranking-empty">データを読み込み中...</li>
+      </ul>
+    </div>
+  </aside>
+</div>
 
 <script>
 const DATA_URL = 'https://yokosugi.github.io/sales-topic/alerts-data.json';
 
-let allAlerts = [], likeCounts = {}, sortMode = 'date', searchQuery = '', activeKeyword = 'ALL';
+let allAlerts = [], likeCounts = {}, searchQuery = '', activeKeyword = 'ALL';
 let likedSet = new Set(JSON.parse(localStorage.getItem('alert_liked') || '[]'));
 let firebaseReady = false;
 
@@ -164,6 +201,7 @@ function onFirebaseReady() {
   window._onValue(window._ref(window._db, 'likes'), snap => {
     likeCounts = snap.val() || {};
     renderAlerts();
+    renderRanking();
   });
 }
 
@@ -178,6 +216,7 @@ async function loadAlerts() {
     document.getElementById('last-updated').textContent = '最終更新: ' + (data.lastUpdated || '不明');
     buildSelect();
     renderAlerts();
+    renderRanking();
   } catch(e) {
     document.getElementById('alerts-container').innerHTML =
       '<div class="state-msg"><div class="icon">⚠️</div><p>データの読み込みに失敗しました</p></div>';
@@ -196,11 +235,6 @@ function buildSelect() {
   sel.addEventListener('change', e => { activeKeyword = e.target.value; renderAlerts(); });
 }
 
-function setSort(btn) {
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active'); sortMode = btn.dataset.sort; renderAlerts();
-}
-
 function renderAlerts() {
   let list = allAlerts.filter(a => {
     const kwOk = activeKeyword === 'ALL' || a.keyword === activeKeyword;
@@ -208,7 +242,6 @@ function renderAlerts() {
     const txOk = !q || (a.title||'').toLowerCase().includes(q) || (a.snippet||'').toLowerCase().includes(q) || (a.source||'').toLowerCase().includes(q);
     return kwOk && txOk;
   });
-  if (sortMode === 'likes') list = [...list].sort((a,b) => (likeCounts[b.id]||0)-(likeCounts[a.id]||0));
 
   document.getElementById('count-badge').textContent = list.length + ' 件';
   const c = document.getElementById('alerts-container');
@@ -237,10 +270,38 @@ function renderAlerts() {
   }).join('');
 }
 
+function renderRanking() {
+  const ranked = allAlerts
+    .map(a => ({ ...a, likes: likeCounts[a.id] || 0 }))
+    .filter(a => a.likes > 0)
+    .sort((a, b) => b.likes - a.likes)
+    .slice(0, 10);
+
+  const ul = document.getElementById('ranking-list');
+  if (!ranked.length) {
+    ul.innerHTML = '<li class="ranking-empty">まだ注目された記事がありません</li>';
+    return;
+  }
+
+  const rankClass = i => i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+  const rankMark = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+
+  ul.innerHTML = ranked.map((a, i) => `
+    <li class="ranking-item">
+      <span class="rank-num ${rankClass(i)}">${rankMark(i)}</span>
+      <div class="rank-body">
+        <div class="rank-title"><a href="${a.url||'#'}" target="_blank" rel="noopener">${a.title||'（タイトルなし）'}</a></div>
+        <div class="rank-meta">
+          <span class="rank-likes">❤️ ${a.likes}</span>
+          <span class="rank-kw">${a.keyword||''}</span>
+        </div>
+      </div>
+    </li>`).join('');
+}
+
 function toggleLike(id, btn) {
   if (!firebaseReady) { alert('Firebaseが未設定です。'); return; }
   const already = likedSet.has(id);
-  // 楽観的にliveCountsも更新してからトランザクション
   likeCounts[id] = Math.max(0, (likeCounts[id]||0) + (already ? -1 : 1));
   window._runTransaction(window._ref(window._db, 'likes/'+id), cur => Math.max(0,(cur||0)+(already?-1:1)));
   already ? likedSet.delete(id) : likedSet.add(id);
@@ -249,7 +310,9 @@ function toggleLike(id, btn) {
   btn.querySelector('.like-icon').textContent = already ? '🤍' : '❤️';
   const countEl = document.getElementById('lc-' + id);
   if (countEl) countEl.textContent = likeCounts[id];
+  renderRanking();
 }
+
 document.getElementById('search-input').addEventListener('input', e => { searchQuery = e.target.value; renderAlerts(); });
 
 loadAlerts();
