@@ -240,15 +240,16 @@ function renderAlerts() {
 function toggleLike(id, btn) {
   if (!firebaseReady) { alert('Firebaseが未設定です。'); return; }
   const already = likedSet.has(id);
+  // 楽観的にliveCountsも更新してからトランザクション
+  likeCounts[id] = Math.max(0, (likeCounts[id]||0) + (already ? -1 : 1));
   window._runTransaction(window._ref(window._db, 'likes/'+id), cur => Math.max(0,(cur||0)+(already?-1:1)));
   already ? likedSet.delete(id) : likedSet.add(id);
   localStorage.setItem('alert_liked', JSON.stringify([...likedSet]));
   btn.classList.toggle('liked', !already);
   btn.querySelector('.like-icon').textContent = already ? '🤍' : '❤️';
   const countEl = document.getElementById('lc-' + id);
-  if (countEl) countEl.textContent = Math.max(0, (likeCounts[id]||0) + (already ? -1 : 1));
+  if (countEl) countEl.textContent = likeCounts[id];
 }
-
 document.getElementById('search-input').addEventListener('input', e => { searchQuery = e.target.value; renderAlerts(); });
 
 loadAlerts();
